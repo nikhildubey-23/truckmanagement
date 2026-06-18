@@ -1,3 +1,4 @@
+import os
 from flask import Flask, redirect, session
 from datetime import date, datetime
 from config import Config
@@ -6,8 +7,12 @@ from models import User
 
 
 def create_app():
-    app = Flask(__name__)
+    static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+    app = Flask(__name__, static_folder=static_dir, static_url_path='/static')
     app.config.from_object(Config)
+
+    from whitenoise import WhiteNoise
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=static_dir, prefix='static/')
 
     db.init_app(app)
 
